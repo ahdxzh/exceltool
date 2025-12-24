@@ -30,12 +30,17 @@ public class ExcelToolConfig {
      *
      * @return 扫描包路径，默认值：exceltool.builder.strategy.impl
      */
-    public static String getStrategyScanPackage() {
-        return PROPS.getStr("excel.strategy.scan.package", "exceltool.builder.strategy.impl");
+    public static String[] getStrategyScanPackage() {
+        String strategyScanPackageStr = PROPS.getStr("excel.strategy.scan.package", "exceltool.builder.strategy.impl");
+        return Arrays.stream(strategyScanPackageStr.split(","))
+                .map(String::trim)
+                .filter(str -> !str.isEmpty())
+                .distinct()
+                .toArray(String[]::new);
     }
 
     public static String[] getCustStrategyScanPackageList() {
-        String custPackageListStr = PROPS.getStr("excel.strategy.scan.cust.package", "exceltool.builder.strategy.impl.highlight");
+        String custPackageListStr = PROPS.getStr("excel.strategy.list.scan.package", "exceltool.builder.strategy.impl.highlight");
         return Arrays.stream(custPackageListStr.split(","))
                 .map(String::trim)
                 .filter(str -> !str.isEmpty())

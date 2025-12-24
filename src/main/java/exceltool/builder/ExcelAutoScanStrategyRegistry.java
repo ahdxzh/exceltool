@@ -1,17 +1,14 @@
 package exceltool.builder;
 
-import exceltool.builder.strategy.annotation.ExcelFormatStrategy;
 import exceltool.builder.strategy.CellFormatStrategy;
+import exceltool.builder.strategy.annotation.ExcelFormatStrategy;
 import exceltool.config.ExcelToolConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -22,7 +19,7 @@ public class ExcelAutoScanStrategyRegistry {
     // 策略存放列表
     private static final List<CellFormatStrategy> FORMAT_STRATEGIES = new ArrayList<>();
     // 指定策略扫描包（可配置到yml中，此处硬编码为示例）
-    private static final String STRATEGY_SCAN_PACKAGE = ExcelToolConfig.getStrategyScanPackage();
+    private static final String[] STRATEGY_SCAN_PACKAGE_ARRAY = ExcelToolConfig.getStrategyScanPackage();
     // 默认排序值
     private static final int DEFAULT_ORDER = 100;
 
@@ -38,7 +35,12 @@ public class ExcelAutoScanStrategyRegistry {
         try {
             // 1. 构建反射配置：仅保留setUrls，不做任何排除配置（按用户要求）
             ConfigurationBuilder configBuilder = new ConfigurationBuilder()
-                    .setUrls(ClasspathHelper.forPackage(STRATEGY_SCAN_PACKAGE));
+                    .setUrls(
+                            Arrays.stream(STRATEGY_SCAN_PACKAGE_ARRAY)
+                                    .flatMap(pkg -> ClasspathHelper.forPackage(pkg).stream())
+                                    .filter(Objects::nonNull)
+                                    .collect(Collectors.toSet())
+                    );
 
             // 2. 正确创建Reflections实例
             Reflections reflections = new Reflections(configBuilder);
