@@ -5,6 +5,7 @@ import cn.hutool.setting.dialect.Props;
 import exceltool.model.feishu.FeishuCredential;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -16,7 +17,7 @@ public class ExcelToolConfig {
     private static final String CONFIG_FILE = "exceltool.properties";
 
     static {
-        // 兼容旧版本Hutool：通过getResource判断配置文件是否存在
+        // 通过getResource判断配置文件是否存在
         if (ResourceUtil.getResource(CONFIG_FILE) != null) {
             PROPS = new Props(CONFIG_FILE);
         } else {
@@ -33,8 +34,13 @@ public class ExcelToolConfig {
         return PROPS.getStr("excel.strategy.scan.package", "exceltool.builder.strategy.impl");
     }
 
-    public static String getCustStrategyScanPackage() {
-        return PROPS.getStr("excel.strategy.scan.cust.package", "exceltool.builder.strategy.impl.cust");
+    public static String[] getCustStrategyScanPackageList() {
+        String custPackageListStr = PROPS.getStr("excel.strategy.scan.cust.package", "exceltool.builder.strategy.impl.highlight");
+        return Arrays.stream(custPackageListStr.split(","))
+                .map(String::trim)
+                .filter(str -> !str.isEmpty())
+                .distinct()
+                .toArray(String[]::new);
     }
 
     /**

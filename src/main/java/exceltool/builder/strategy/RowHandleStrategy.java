@@ -9,6 +9,7 @@ import org.reflections.util.ConfigurationBuilder;
 
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Excel行数据格式处理策略类
@@ -17,7 +18,7 @@ import java.util.*;
 @Slf4j
 public class RowHandleStrategy {
     // 自定义策略扫描包路径（提取为常量，便于配置修改）
-    private static final String CUST_STRATEGY_SCAN_PACKAGE = ExcelToolConfig.getCustStrategyScanPackage();
+    private static final String[] CUST_STRATEGY_SCAN_PACKAGE_ARRAY = ExcelToolConfig.getCustStrategyScanPackageList();
     // 格式编码Map（存储List类型格式编码映射，LinkedHashMap保证有序）
     private static final Map<String, String> FORMAT_CODE_MAP;
     // List后缀常量（语义化命名，便于理解）
@@ -41,7 +42,10 @@ public class RowHandleStrategy {
         try {
             // 构建Reflections配置，指定扫描包
             ConfigurationBuilder configBuilder = new ConfigurationBuilder()
-                    .setUrls(ClasspathHelper.forPackage(CUST_STRATEGY_SCAN_PACKAGE))
+                    .setUrls(Arrays.stream(CUST_STRATEGY_SCAN_PACKAGE_ARRAY)
+                            .flatMap(pkg -> ClasspathHelper.forPackage(pkg).stream())
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toSet()))
                     .setParallel(true); // 开启并行扫描，提升扫描效率（多模块场景下更明显）
 
             Reflections reflections = new Reflections(configBuilder);

@@ -1,4 +1,4 @@
-package exceltool.builder.strategy.impl.cust;
+package exceltool.builder.strategy.impl.summary;
 
 import exceltool.builder.strategy.CellFormatStrategy;
 import exceltool.builder.strategy.annotation.ExcelFormatStrategy;

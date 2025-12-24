@@ -1,4 +1,4 @@
-package exceltool.builder.strategy.impl.cust;
+package exceltool.builder.strategy.impl.summary;
 
 import exceltool.builder.strategy.CellFormatStrategy;
 import exceltool.builder.strategy.annotation.ExcelFormatStrategy;
@@ -13,10 +13,10 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  */
 @SuppressWarnings("unused")
 @ExcelFormatStrategy(order = 1)
-public class BlueHighlightFormatStrategy implements CellFormatStrategy {
-    private static final String FORMAT_CODE = "blueHighlight";
-    private static final String ROW_BG_COLOR = "#87CEFA";
-    private static final String CELL_BG_COLOR = "";
+public class TotalSummaryFormatStrategy implements CellFormatStrategy {
+    private static final String FORMAT_CODE = "totalSummary";
+    private static final String ROW_BG_COLOR = "#FEF6DE";
+    private static final String CELL_BG_COLOR = "#FBE395";
 
     @Override
     public void handle(XSSFWorkbook workbook, XSSFCell cell, DataWithFormat dataWithFormat, XSSFCellStyle originalCellStyle) {
