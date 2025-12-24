@@ -4,13 +4,11 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import exceltool.config.ExcelToolConfig;
+import exceltool.model.feishu.FeishuCredential;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,8 +23,9 @@ public class FeishuUtils {
     private static final int ERROR_CODE_TOKEN_INVALID = 99991663;
     private static final int SUCCESS_CODE = 0;
     // 请求URL常量
-    private static final String TOKEN_URL = "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal";
-    private static final String UPLOAD_IMAGE_URL = "https://open.feishu.cn/open-apis/im/v1/images";
+    private static final String FEISHU_ROOT_URL = "https://open.feishu.cn/open-apis";
+    private static final String TOKEN_URL = FEISHU_ROOT_URL + "/auth/v3/tenant_access_token/internal";
+    private static final String UPLOAD_IMAGE_URL = FEISHU_ROOT_URL + "/open-apis/im/v1/images";
     // 请求头常量
     private static final String HEADER_AUTHORIZATION = "Authorization";
     private static final String HEADER_BEARER_PREFIX = "Bearer ";
@@ -56,27 +55,21 @@ public class FeishuUtils {
     private static final String OP_DESC_SEND_IMAGE = "图片发送到聊天窗口";
 
     // ================================ 账号配置（可后续迁移至配置文件） ================================
-    @Data
-    @AllArgsConstructor
-    private static class Credential {
-        String appId;
-        String appSecret;
-        String accessToken; // 缓存Token
-        long expireAt;      // Token到期时间（秒）
-    }
+    private static final List<FeishuCredential> CREDENTIALS;
 
-    // 账号列表（优先使用自建账户，避免影响公司业务）
-    private static final List<Credential> CREDENTIALS = new ArrayList<>(Arrays.asList(
-            new Credential("cli_a53a3449003d5013", "71wrAp0M1B61v9jeQc7BAc1FKfSss6ea", null, 0),
-            new Credential("cli_a53a3bc70459d00e", "XZSzwAIH569OrjFVnrjsdgfu8Bc8GJCS", null, 0)
-    ));
+    static {
+        // 从配置加载账号
+        CREDENTIALS = ExcelToolConfig.getFeishuCredentials();
+    }
 
     private static int currentIndex = 0; // 当前使用的账号索引
 
     // ================================ 公共工具方法（消除代码冗余） ================================
+
     /**
      * 统一校验HTTP响应结果
-     * @param resp HTTP响应对象
+     *
+     * @param resp          HTTP响应对象
      * @param operationDesc 操作描述（用于精准提示异常信息）
      */
     private static void validateHttpResponse(HttpResponse resp, String operationDesc) {
@@ -128,7 +121,8 @@ public class FeishuUtils {
 
     /**
      * 校验参数有效性
-     * @param file 图片文件（可为null，仅上传/发送时校验）
+     *
+     * @param file       图片文件（可为null，仅上传/发送时校验）
      * @param webhookUrl WebHook地址（可为null，仅发送时校验）
      */
     private static void validateParams(File file, String webhookUrl) {
@@ -152,12 +146,14 @@ public class FeishuUtils {
     }
 
     // ================================ Token相关方法 ================================
+
     /**
      * 获取租户AccessToken（带缓存，同步锁保证线程安全）
+     *
      * @param credential 账号认证信息
      * @return 有效AccessToken
      */
-    private static synchronized String getTenantAccessToken(Credential credential) {
+    private static synchronized String getTenantAccessToken(FeishuCredential credential) {
         if (credential == null) {
             throw new IllegalArgumentException("账号认证信息不能为空");
         }
@@ -216,6 +212,7 @@ public class FeishuUtils {
 
     /**
      * 多账号故障转移执行方法
+     *
      * @param job 待执行的业务逻辑
      * @param <T> 返回值类型
      * @return 业务逻辑执行结果
@@ -250,8 +247,10 @@ public class FeishuUtils {
     }
 
     // ================================ 图片上传相关方法 ================================
+
     /**
      * 上传图片（带多账号故障转移）
+     *
      * @param file 图片文件
      * @return 图片唯一标识image_key
      */
@@ -264,11 +263,12 @@ public class FeishuUtils {
 
     /**
      * 实际执行图片上传逻辑
+     *
      * @param credential 账号认证信息
-     * @param file 图片文件
+     * @param file       图片文件
      * @return 图片唯一标识image_key
      */
-    private static String doUploadImage(Credential credential, File file) {
+    private static String doUploadImage(FeishuCredential credential, File file) {
         // 获取有效Token
         String token = getTenantAccessToken(credential);
 
@@ -300,10 +300,12 @@ public class FeishuUtils {
     }
 
     // ================================ 图片发送相关方法 ================================
+
     /**
      * 发送图片到飞书聊天窗口（WebHook方式）
+     *
      * @param webhookUrl 聊天窗口WebHook地址
-     * @param file 图片文件
+     * @param file       图片文件
      */
     public static void sendImageToChat(String webhookUrl, File file) {
         validateParams(file, webhookUrl);

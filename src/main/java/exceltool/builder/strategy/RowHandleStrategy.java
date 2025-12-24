@@ -1,5 +1,6 @@
 package exceltool.builder.strategy;
 
+import exceltool.config.ExcelToolConfig;
 import exceltool.param.DataWithFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
@@ -16,7 +17,7 @@ import java.util.*;
 @Slf4j
 public class RowHandleStrategy {
     // 自定义策略扫描包路径（提取为常量，便于配置修改）
-    private static final String CUST_STRATEGY_SCAN_PACKAGE = "exceltool.builder.strategy.impl.cust";
+    private static final String CUST_STRATEGY_SCAN_PACKAGE = ExcelToolConfig.getCustStrategyScanPackage();
     // 格式编码Map（存储List类型格式编码映射，LinkedHashMap保证有序）
     private static final Map<String, String> FORMAT_CODE_MAP;
     // List后缀常量（语义化命名，便于理解）

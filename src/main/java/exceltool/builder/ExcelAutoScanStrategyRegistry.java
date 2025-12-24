@@ -2,6 +2,7 @@ package exceltool.builder;
 
 import exceltool.builder.strategy.annotation.ExcelFormatStrategy;
 import exceltool.builder.strategy.CellFormatStrategy;
+import exceltool.config.ExcelToolConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
@@ -21,7 +22,7 @@ public class ExcelAutoScanStrategyRegistry {
     // 策略存放列表
     private static final List<CellFormatStrategy> FORMAT_STRATEGIES = new ArrayList<>();
     // 指定策略扫描包（可配置到yml中，此处硬编码为示例）
-    private static final String STRATEGY_SCAN_PACKAGE = "exceltool.builder.strategy.impl";
+    private static final String STRATEGY_SCAN_PACKAGE = ExcelToolConfig.getStrategyScanPackage();
     // 默认排序值
     private static final int DEFAULT_ORDER = 100;
 
