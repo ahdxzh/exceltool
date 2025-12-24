@@ -25,7 +25,7 @@ public class FeishuUtils {
     // 请求URL常量
     private static final String FEISHU_ROOT_URL = "https://open.feishu.cn/open-apis";
     private static final String TOKEN_URL = FEISHU_ROOT_URL + "/auth/v3/tenant_access_token/internal";
-    private static final String UPLOAD_IMAGE_URL = FEISHU_ROOT_URL + "/open-apis/im/v1/images";
+    private static final String UPLOAD_IMAGE_URL = FEISHU_ROOT_URL + "/im/v1/images";
     // 请求头常量
     private static final String HEADER_AUTHORIZATION = "Authorization";
     private static final String HEADER_BEARER_PREFIX = "Bearer ";
